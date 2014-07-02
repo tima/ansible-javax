@@ -1,0 +1,109 @@
+#!/usr/bin/python
+# -*- coding: utf-8 -*-
+
+# (c) 2014, Timothy Appnel <tim@appnel.com>
+#
+# Ansible is free software: you can redistribute it and/or modify
+# it under the terms of the GNU General Public License as published by
+# the Free Software Foundation, either version 3 of the License, or
+# (at your option) any later version.
+#
+# Ansible is distributed in the hope that it will be useful,
+# but WITHOUT ANY WARRANTY; without even the implied warranty of
+# MERCHANTABILITY or FITNESS FOR A PARTICULAR PURPOSE.  See the
+# GNU General Public License for more details.
+#
+# You should have received a copy of the GNU General Public License
+# along with Ansible.  If not, see <http://www.gnu.org/licenses/>.
+
+DOCUMENTATION = \
+    '''
+---
+module: javax
+short_description: A module for executing an arbitrary java class or jar.
+description:
+    - This is a wrapper around java. BLAH BLAH.
+
+author: Timothy Appnel
+'''
+
+EXAMPLES = '''
+'''
+
+# daemonize option
+# verbose if debugging on?
+# Xprof if debugging on?
+# support if module.check_mode:
+
+# http://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html
+# -Xms1024m -Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError
+
+def main():
+    module = AnsibleModule(argument_spec=dict(
+        init_heap_size=dict(default=None),
+        max_heap_size=dict(default=None),
+        thread_stack=dict(default=None),
+        classpath=dict(type='list'),
+        properties=dict(type='dict'),
+        java_opts=dict(type='list'),
+        java_args=dict(type='list'),
+        executable=dict(default='java'),
+        jar=dict(default=None),
+        javaclass=dict(default=None),
+        ), supports_check_mode=False)
+
+    init_heap_size = module.params['init_heap_size'] # + Xms alias
+    max_heap_size = module.params['max_heap_size'] # + Xmx alias
+    thread_stack = module.params['thread_stack'] # + Xms alias
+    classpath = module.params['classpath'] # + cp alias
+    properties = module.params['properties']
+    java_opts = module.params['java_opts']
+    java_args = module.params['java_args']
+    java = module.params['java']
+    jar = module.params['jar']
+    javaclass = module.params['javaclass'] # + class alias
+
+    if not jar and not javaclass: # jar or class is required, but not both
+        return module.fail_json(msg='Must specify a "jar" or "class"',
+                                changed=False)
+    elif jar and javaclass:
+        return module.fail_json(msg='Cannot specify a "jar" and "class"'
+                                , changed=False)
+
+    cmd = ''
+    if init_heap_size:
+        cmd = cmd + ' -Xms%s' % init_heap_size
+    if max_heap_size:
+        cmd = cmd + ' -Xmx%s' % max_heap_size
+    if thread_stack:
+        cmd = cmd + ' -Xss%s' % thread_stack
+    if classpath:
+        cmd = cmd + ' -classpath "' + ';'.join(classpath) + '"'
+    if properties:
+        for (k, v) in properties.items():
+            if ' ' in v:
+                v = '"' + v + '"'
+            cmd = cmd + ' -D%s=%s' % (k, v)
+    if java_opts:
+        cmd = cmd + ' ' + ' '.join(java_opts)
+    if jar:
+        cmd = ' '.join([java, cmd, '-jar %s' % jar])
+    else:
+        cmd = ' '.join([java, cmd, javaclass])
+    if java_args:
+        cmd = cmd + ' ' + ' '.join(java_args)
+
+    cmdstr = cmd
+    (rc, out, err) = module.run_command(cmd)
+    if rc:
+        return module.fail_json(msg=err, rc=rc, cmd=cmdstr)
+    else:
+        return module.exit_json(changed=changed, msg=out, rc=rc,
+                                cmd=cmdstr)
+
+# import module snippets
+
+from ansible.module_utils.basic import *
+
+main()
+
