@@ -59,7 +59,7 @@ def main():
     properties = module.params['properties']
     java_opts = module.params['java_opts']
     java_args = module.params['java_args']
-    java = module.params['java']
+    java = module.params['executable']
     jar = module.params['jar']
     javaclass = module.params['javaclass'] # + class alias
 
