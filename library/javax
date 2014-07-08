@@ -70,6 +70,7 @@ def main():
         return module.fail_json(msg='Cannot specify a "jar" and "class"'
                                 , changed=False)
 
+    changed = True
     cmd = ''
     if init_heap_size:
         cmd = cmd + ' -Xms%s' % init_heap_size
