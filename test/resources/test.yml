@@ -1,0 +1,18 @@
+--- 
+# A quick test of the javax module in a playbook. Don't forget to add the module to ANSIBLE_LIBRARY
+- hosts: localhost
+  gather_facts: no
+  vars:
+    path: "/tmp/javax/test/resources"
+  tasks:
+    - name: directory
+      file: state=directory path={{ path }}
+    - name: copy test app
+      copy: src=propsdump.jar dest={{ path }}
+    - name: javax
+      javax: classpath={{ path }}/propsdump.jar javaclass='PropsDump' init_heap_size=1024m max_heap_size=2048m java_opts='-XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError'
+      args:
+        properties:
+          Name: Foo
+          Hello: World
+
