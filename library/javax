@@ -23,7 +23,62 @@ module: javax
 short_description: A module for executing an arbitrary java class or jar.
 description:
     - This is a wrapper around java. BLAH BLAH.
-
+short_description:  Manage services.
+description:
+    - Controls services on remote hosts.
+options:
+    jar:
+        required: false
+        description:
+        - The JAR file that contains the Java class you want to run. Required if the 
+          C(javaclass) option is omitted.
+    javaclass:
+        required: false
+        description:
+        - The main Java class to run. Required if the C(jar) option is omitted.
+    properties:
+        required: false
+        description:
+        - A dict of key value pairs representing system properties to pass the java 
+          application being run. This is the equivalent of the C(-D) commandline 
+          option. 
+    classpath:
+        required: false
+        description:
+        - A list of file system paths the JVM should search to find any 
+          dependencies. The module will take the list and properly concatenate the
+          list of values. The equivalent of the C(-classpath) or C(-cp) commandline 
+          option.
+    init_heap_size:
+        required: false
+        description:
+        - Sets initial Java heap size for the application. Equivalent of the C(-Xms) 
+          'non-stndard' commandline option.  
+    max_heap_size:
+        required: false
+        description:
+        - Sets maximum Java heap size for the application. Equivalent of the C(-Xmx) 
+          'non-stndard' commandline option.  
+    thread_stack:
+        required: false
+        description:
+        - Sets java thread stack size for the application. Equivalent of the C(-Xss) 
+          'non-stndard' commandline option.  
+    executable:
+        required: false
+        default: java
+        description:
+        - Path to java JVM to use. If not supplied,
+          the normal mechanism for resolving binary paths will be used.    
+    java_opts:
+        required: false
+        description:
+        - Specify additional java options not supported by this module by passing 
+          in a list of strings.
+    java_args:
+        required: false
+        description:
+        - Specify a list of strings to be passed as parameters to the java application.
 author: Timothy Appnel
 '''
 
@@ -64,10 +119,10 @@ def main():
     javaclass = module.params['javaclass'] # + class alias
 
     if not jar and not javaclass: # jar or class is required, but not both
-        return module.fail_json(msg='Must specify a "jar" or "class"',
+        return module.fail_json(msg='Must specify a "jar" or "javaclass"',
                                 changed=False)
     elif jar and javaclass:
-        return module.fail_json(msg='Cannot specify a "jar" and "class"'
+        return module.fail_json(msg='Cannot specify a "jar" and "javaclass"'
                                 , changed=False)
 
     changed = True
