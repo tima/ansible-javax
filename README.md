@@ -1,7 +1,9 @@
 ansible-javax
 =============
 
-An Ansible module for executing an arbitrary java class or jar
+A module for executing an arbitrary java class or jar in a cleaner, more Ansible-like way.
+
+It is very easy and relatively straight-forward to run a basic Java applications in Ansible using the command or shell modules. Things get complicated and messy pretty quickly when your application needs various options like max heap size or thread stack and has extensive number of class paths and systems properties all being defined on the command line. The javax module helps bring some sanity and readability back to these situations by giving you human-readable argument names and native data structure values to running a Java application from your playbook.
 
 Options:
 
@@ -44,3 +46,5 @@ A dict of key value pairs representing system properties to pass the java applic
 - thread_stack
 
 Sets java thread stack size for the application. Equivalent of the `-Xss' 'non-stndard' commandline option.
+
+
