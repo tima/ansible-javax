@@ -20,12 +20,9 @@ DOCUMENTATION = \
     '''
 ---
 module: javax
-short_description: A module for executing an arbitrary java class or jar.
+short_description: A module for executing an arbitrary java class or jar in a cleaner, more Ansible-like way.
 description:
-    - This is a wrapper around java. BLAH BLAH.
-short_description:  Manage services.
-description:
-    - Controls services on remote hosts.
+    - It is very easy and relatively straight-forward to run a basic Java applications in Ansible using the command or shell modules. Things get complicated and messy pretty quickly when your application needs various options like max heap size or thread stack and has extensive number of class paths and systems properties all being defined on the command line. The javax module helps bring some sanity and readability back to these situations by giving you human-readable argument names and native data structure values to running a Java application from your playbook.
 options:
     jar:
         required: false
@@ -83,13 +80,21 @@ author: Timothy Appnel
 '''
 
 EXAMPLES = '''
+javax: javaclass='MyMainClass' init_heap_size=1024m max_heap_size=2048m
+args:
+  properties:
+    Name: Foo
+    Hello: World
+  classpath:
+    - /path/to/some.jar
+  java_opts:
+    - '-XX:MaxPermSize=512m'
+    - '-XX:+HeapDumpOnOutOfMemoryError'
 '''
 
-# daemonize option
 # verbose if debugging on?
 # Xprof if debugging on?
 # support if module.check_mode:
-
 # http://docs.oracle.com/javase/7/docs/technotes/tools/windows/java.html
 # -Xms1024m -Xmx2048m -XX:MaxPermSize=512m -XX:+HeapDumpOnOutOfMemoryError
 
